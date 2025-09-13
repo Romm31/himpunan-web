@@ -49,3 +49,11 @@ model About {
   misi     String
   profile  String
 }
+
+model VisiMisi {
+  id        Int      @id @default(autoincrement())
+  visi      String
+  misi      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

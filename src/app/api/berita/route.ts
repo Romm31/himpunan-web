@@ -1,42 +1,49 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";   // ✅ pake named import
 
-export async function GET() {
-  try {
-    const berita = await prisma.berita.findMany({
-      include: { kategori: true },
-      orderBy: { createdAt: "desc" },
-    });
-    return NextResponse.json(berita);
-  } catch (err: unknown) {
-    console.error("❌ Error GET /api/berita:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json(
-      { error: "Gagal mengambil data", detail: message },
-      { status: 500 }
-    );
-  }
+interface BeritaRequest {
+  judul: string;
+  konten: string;
+  gambarUrl?: string | null;
+  kategoriId?: number | null;
 }
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body: BeritaRequest = await req.json();
+    const { judul, konten, gambarUrl, kategoriId } = body;
 
-    const judul = body.judul || "Tanpa Judul";
-    const konten = body.konten || "";
-    const gambarUrl = body.gambarUrl ?? null;
-    const kategoriId = body.kategoriId ?? null;
+    if (!judul || judul.trim() === "") {
+      return NextResponse.json(
+        { success: false, message: "Judul wajib diisi", data: null },
+        { status: 400 }
+      );
+    }
+
+    if (!konten || konten.trim() === "") {
+      return NextResponse.json(
+        { success: false, message: "Konten wajib diisi", data: null },
+        { status: 400 }
+      );
+    }
 
     const berita = await prisma.berita.create({
-      data: { judul, konten, gambarUrl, kategoriId },
+      data: {
+        judul,
+        konten,
+        gambarUrl: gambarUrl ?? null,
+        kategoriId: kategoriId ?? null,
+      },
     });
 
-    return NextResponse.json(berita, { status: 201 });
-  } catch (err: unknown) {
-    console.error("❌ Error POST /api/berita:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json(
-      { error: "Gagal menambah berita", detail: message },
+      { success: true, message: "Berita berhasil ditambahkan", data: berita },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error tambah berita:", error);
+    return NextResponse.json(
+      { success: false, message: "Terjadi kesalahan server", data: null },
       { status: 500 }
     );
   }

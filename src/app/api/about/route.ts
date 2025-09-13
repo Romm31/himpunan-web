@@ -1,44 +1,51 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET about (ambil 1 record pertama)
-export async function GET() {
+interface AboutRequest {
+  visi: string;
+  misi: string;
+  profile: string;
+}
+
+// ✅ CREATE
+export async function POST(req: Request) {
   try {
-    const about = await prisma.about.findFirst();
-    return NextResponse.json(about);
-  } catch (err: unknown) {
-    console.error("❌ Error GET /api/about:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
+    const body: AboutRequest = await req.json();
+    if (!body.visi || !body.misi || !body.profile) {
+      return NextResponse.json(
+        { success: false, message: "Visi, misi, dan profile wajib diisi", data: null },
+        { status: 400 }
+      );
+    }
+
+    const about = await prisma.about.create({ data: body });
     return NextResponse.json(
-      { error: "Gagal mengambil data about", detail: message },
+      { success: true, message: "About berhasil ditambahkan", data: about },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error tambah about:", error);
+    return NextResponse.json(
+      { success: false, message: "Terjadi kesalahan server", data: null },
       { status: 500 }
     );
   }
 }
 
-// POST buat about baru
-export async function POST(req: Request) {
+// ✅ GET (ambil yang terakhir / unique)
+export async function GET() {
   try {
-    const body = await req.json();
-    const { visi, misi, profile } = body;
-
-    if (!visi || !misi || !profile) {
-      return NextResponse.json(
-        { error: "Semua field wajib diisi (visi, misi, profile)" },
-        { status: 400 }
-      );
-    }
-
-    const about = await prisma.about.create({
-      data: { visi, misi, profile },
+    const about = await prisma.about.findFirst({
+      orderBy: { id: "desc" },
     });
-
-    return NextResponse.json(about, { status: 201 });
-  } catch (err: unknown) {
-    console.error("❌ Error POST /api/about:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json(
-      { error: "Gagal menambah about", detail: message },
+      { success: true, message: "About ditemukan", data: about },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error ambil about:", error);
+    return NextResponse.json(
+      { success: false, message: "Terjadi kesalahan server", data: null },
       { status: 500 }
     );
   }

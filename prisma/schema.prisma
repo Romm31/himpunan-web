@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Kategori {
+  id        Int      @id @default(autoincrement())
+  nama      String   @unique
+  berita    Berita[]
+}
+
+model Berita {
+  id         Int      @id @default(autoincrement())
+  judul      String
+  konten     String   // nanti bisa pakai rich text
+  gambarUrl  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  kategoriId Int?
+  kategori   Kategori? @relation(fields: [kategoriId], references: [id])
+}
+
+model Event {
+  id        Int      @id @default(autoincrement())
+  judul     String
+  deskripsi String
+  tanggal   DateTime
+  lokasi    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model About {
+  id       Int    @id @default(autoincrement())
+  visi     String
+  misi     String
+  profile  String
+}

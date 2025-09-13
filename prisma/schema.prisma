@@ -23,12 +23,12 @@ model Kategori {
 }
 
 model Berita {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   judul      String
-  konten     String   // nanti bisa pakai rich text
+  konten     String
   gambarUrl  String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
   kategoriId Int?
   kategori   Kategori? @relation(fields: [kategoriId], references: [id])
 }

@@ -1,7 +1,9 @@
+// src/app/api/berita/[id]/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
-// GET berita by ID
+// ✅ Ambil 1 berita (publik, tanpa token)
 export async function GET(
   req: Request,
   { params }: { params: { id: string } }
@@ -13,49 +15,79 @@ export async function GET(
     });
 
     if (!berita) {
-      return NextResponse.json({ error: "Berita tidak ditemukan" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "Berita tidak ditemukan" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(berita);
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Error mengambil berita" }, { status: 500 });
+  } catch (error) {
+    console.error("GET detail error:", error);
+    return NextResponse.json(
+      { success: false, message: "Gagal ambil detail berita" },
+      { status: 500 }
+    );
   }
 }
 
-// PUT update berita
+// ✅ Update berita (butuh token admin)
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await req.json();
-    const { judul, konten, gambarUrl, kategoriId } = body;
+    const user = await verifyToken(req);
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
-    const berita = await prisma.berita.update({
+    const { judul, konten, kategoriId, gambarUrl } = await req.json();
+
+    const updated = await prisma.berita.update({
       where: { id: Number(params.id) },
-      data: { judul, konten, gambarUrl, kategoriId },
+      data: { judul, konten, kategoriId, gambarUrl },
     });
 
-    return NextResponse.json(berita);
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Error update berita" }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      message: "Berita berhasil diupdate",
+      data: updated,
+    });
+  } catch (error) {
+    console.error("PUT error:", error);
+    return NextResponse.json(
+      { success: false, message: "Gagal update berita" },
+      { status: 500 }
+    );
   }
 }
 
-// DELETE hapus berita
+// ✅ Hapus berita (butuh token admin)
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    await prisma.berita.delete({
-      where: { id: Number(params.id) },
-    });
-    return NextResponse.json({ message: "Berita dihapus" });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Error hapus berita" }, { status: 500 });
+    const user = await verifyToken(req);
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    await prisma.berita.delete({ where: { id: Number(params.id) } });
+
+    return NextResponse.json({ message: "Berita berhasil dihapus" });
+  } catch (error) {
+    console.error("DELETE error:", error);
+    return NextResponse.json(
+      { success: false, message: "Gagal hapus berita" },
+      { status: 500 }
+    );
   }
 }

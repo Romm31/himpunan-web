@@ -1,26 +1,25 @@
+// src/lib/auth.ts
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret123";
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-export interface AuthPayload {
-  id: number;
-  email: string;
-}
+export function verifyToken(req: Request) {
+  const authHeader = req.headers.get("authorization");
 
-export async function verifyToken(req: Request) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authHeader.split(" ")[1];
+
   try {
-    const authHeader = req.headers.get("authorization");
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return { success: false, message: "Token tidak ada" };
-    }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
-
-    return { success: true, user: decoded };
-  } catch (error) {
-    console.error("JWT verify error:", error);
-    return { success: false, message: "Token tidak valid" };
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: number;
+      email: string;
+    };
+    return decoded;
+  } catch (err) {
+    console.error("JWT verify error:", err);
+    return null;
   }
 }

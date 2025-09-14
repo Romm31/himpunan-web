@@ -1,54 +1,54 @@
+// src/app/api/about/[id]/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
 
-// PUT update about
-export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const body = await req.json();
-    const { visi, misi, profile } = body;
-
-    if (!visi || !misi || !profile) {
-      return NextResponse.json(
-        { error: "Semua field wajib diisi (visi, misi, profile)" },
-        { status: 400 }
-      );
-    }
-
-    const about = await prisma.about.update({
-      where: { id: Number(params.id) },
-      data: { visi, misi, profile },
-    });
-
-    return NextResponse.json(about);
-  } catch (err: unknown) {
-    console.error("❌ Error PUT /api/about/[id]:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json(
-      { error: "Error update about", detail: message },
-      { status: 500 }
-    );
-  }
+interface Params {
+  params: { id: string };
 }
 
-// DELETE hapus about
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    await prisma.about.delete({
-      where: { id: Number(params.id) },
-    });
-    return NextResponse.json({ message: "About dihapus" });
-  } catch (err: unknown) {
-    console.error("❌ Error DELETE /api/about/[id]:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json(
-      { error: "Error hapus about", detail: message },
-      { status: 500 }
-    );
+// GET about by ID
+export async function GET(req: Request, { params }: Params) {
+  const id = Number(params.id);
+  const data = await prisma.about.findUnique({ where: { id } });
+
+  if (!data) {
+    return NextResponse.json({ success: false, message: "About tidak ditemukan" }, { status: 404 });
   }
+  return NextResponse.json(data);
+}
+
+// PUT update about
+export async function PUT(req: Request, { params }: Params) {
+  const { error } = await requireAuth(req);
+  if (error) return error;
+
+  const id = Number(params.id);
+  const body = (await req.json()) as { visi?: string; misi?: string; profile?: string };
+
+  const exists = await prisma.about.findUnique({ where: { id } });
+  if (!exists) {
+    return NextResponse.json({ success: false, message: "About tidak ditemukan" }, { status: 404 });
+  }
+
+  const data = await prisma.about.update({
+    where: { id },
+    data: {
+      visi: body.visi ?? exists.visi,
+      misi: body.misi ?? exists.misi,
+      profile: body.profile ?? exists.profile,
+    },
+  });
+
+  return NextResponse.json({ success: true, data });
+}
+
+// DELETE about
+export async function DELETE(req: Request, { params }: Params) {
+  const { error } = await requireAuth(req);
+  if (error) return error;
+
+  const id = Number(params.id);
+  await prisma.about.delete({ where: { id } });
+  return NextResponse.json({ success: true, message: "About berhasil dihapus" });
 }

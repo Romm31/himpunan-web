@@ -1,51 +1,30 @@
+// src/app/api/about/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
-interface AboutRequest {
-  visi: string;
-  misi: string;
-  profile: string;
-}
-
-// ✅ CREATE
 export async function POST(req: Request) {
   try {
-    const body: AboutRequest = await req.json();
-    if (!body.visi || !body.misi || !body.profile) {
+    const auth = await verifyToken(req);
+    if (!auth) {
       return NextResponse.json(
-        { success: false, message: "Visi, misi, dan profile wajib diisi", data: null },
-        { status: 400 }
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
       );
     }
 
-    const about = await prisma.about.create({ data: body });
-    return NextResponse.json(
-      { success: true, message: "About berhasil ditambahkan", data: about },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("Error tambah about:", error);
-    return NextResponse.json(
-      { success: false, message: "Terjadi kesalahan server", data: null },
-      { status: 500 }
-    );
-  }
-}
+    const body = await req.json();
+    const { visi, misi, profile } = body;
 
-// ✅ GET (ambil yang terakhir / unique)
-export async function GET() {
-  try {
-    const about = await prisma.about.findFirst({
-      orderBy: { id: "desc" },
+    const about = await prisma.about.create({
+      data: { visi, misi, profile },
     });
+
+    return NextResponse.json({ success: true, data: about });
+  } catch (err) {
+    console.error("POST /about error:", err);
     return NextResponse.json(
-      { success: true, message: "About ditemukan", data: about },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error ambil about:", error);
-    return NextResponse.json(
-      { success: false, message: "Terjadi kesalahan server", data: null },
+      { success: false, message: "Gagal membuat about" },
       { status: 500 }
     );
   }

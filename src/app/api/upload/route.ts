@@ -13,7 +13,6 @@ function ensureUploadDir(dir: string) {
   }
 }
 
-// ambil userId dari token (opsional, kalau gagal ya biarin null)
 async function getUserIdFromAuthHeader(req: Request): Promise<number | null> {
   try {
     const auth = req.headers.get("authorization");
@@ -30,6 +29,32 @@ async function getUserIdFromAuthHeader(req: Request): Promise<number | null> {
   }
 }
 
+// GET /api/upload?page=1&pageSize=20
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const page = Math.max(1, Number(searchParams.get("page") || 1));
+  const pageSize = Math.min(100, Math.max(1, Number(searchParams.get("pageSize") || 20)));
+  const skip = (page - 1) * pageSize;
+
+  const [items, total] = await Promise.all([
+    prisma.upload.findMany({
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: pageSize,
+    }),
+    prisma.upload.count(),
+  ]);
+
+  return NextResponse.json({
+    success: true,
+    page,
+    pageSize,
+    total,
+    items,
+  });
+}
+
+// POST /api/upload  (multipart form, field: file)
 export async function POST(req: Request) {
   try {
     const form = await req.formData();
@@ -42,11 +67,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // siapkan folder
     const uploadDir = path.join(process.cwd(), "public", "uploads");
     ensureUploadDir(uploadDir);
 
-    // buat nama file unik (hindari bentrok)
+    // nama file unik & aman
     const originalName = file.name || "upload";
     const safeBase = originalName.replace(/[^\w.\-]/g, "_");
     const ext = path.extname(safeBase) || "";
@@ -75,8 +99,8 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       message: "File berhasil diupload",
-      data: record,     // ⬅️ metadata lengkap dari Prisma
-      url,              // ⬅️ balikin URL langsung juga biar simple dipake
+      data: record,
+      url,
     });
   } catch (err) {
     console.error("Upload error:", err);

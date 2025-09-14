@@ -29,7 +29,7 @@ async function getUserIdFromAuthHeader(req: Request): Promise<number | null> {
   }
 }
 
-// GET /api/upload?page=1&pageSize=20
+// ✅ GET /api/upload?page=1&pageSize=20
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const page = Math.max(1, Number(searchParams.get("page") || 1));
@@ -54,7 +54,7 @@ export async function GET(req: Request) {
   });
 }
 
-// POST /api/upload  (multipart form, field: file)
+// ✅ POST /api/upload  (multipart form, field: file)
 export async function POST(req: Request) {
   try {
     const form = await req.formData();

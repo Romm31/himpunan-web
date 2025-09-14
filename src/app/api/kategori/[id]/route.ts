@@ -3,59 +3,90 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
-// ✅ Detail kategori
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+// ✅ GET detail kategori + berita terkait
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
+    const id = Number(params.id);
     const kategori = await prisma.kategori.findUnique({
-      where: { id: Number(params.id) },
-      include: { berita: true }, // ikutkan berita di kategori tsb
+      where: { id },
+      include: { berita: true },
     });
 
     if (!kategori) {
-      return NextResponse.json({ success: false, message: "Kategori tidak ditemukan" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "Kategori tidak ditemukan" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(kategori);
-  } catch (err) {
-    return NextResponse.json({ error: "Gagal mengambil kategori" }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { success: false, message: "Gagal mengambil detail kategori" },
+      { status: 500 }
+    );
   }
 }
 
-// ✅ Update kategori (hanya admin)
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+// ✅ PUT update kategori (admin)
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const user = await verifyToken(req);
     if (!user) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: "Unauthorized: Token tidak valid" },
+        { status: 401 }
+      );
     }
 
+    const id = Number(params.id);
     const { nama } = await req.json();
 
     const kategori = await prisma.kategori.update({
-      where: { id: Number(params.id) },
+      where: { id },
       data: { nama },
     });
 
     return NextResponse.json({ success: true, data: kategori });
-  } catch (err) {
-    return NextResponse.json({ error: "Gagal update kategori" }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { success: false, message: "Gagal update kategori" },
+      { status: 500 }
+    );
   }
 }
 
-// ✅ Hapus kategori (hanya admin)
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+// ✅ DELETE kategori (admin)
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const user = await verifyToken(req);
     if (!user) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: "Unauthorized: Token tidak valid" },
+        { status: 401 }
+      );
     }
 
-    await prisma.kategori.delete({
-      where: { id: Number(params.id) },
-    });
+    const id = Number(params.id);
+    await prisma.kategori.delete({ where: { id } });
 
-    return NextResponse.json({ success: true, message: "Kategori berhasil dihapus" });
-  } catch (err) {
-    return NextResponse.json({ error: "Gagal hapus kategori" }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      message: "Kategori berhasil dihapus",
+    });
+  } catch {
+    return NextResponse.json(
+      { success: false, message: "Gagal hapus kategori" },
+      { status: 500 }
+    );
   }
 }

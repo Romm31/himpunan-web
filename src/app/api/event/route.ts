@@ -1,58 +1,45 @@
+// src/app/api/event/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
-interface EventRequest {
-  judul: string;
-  deskripsi: string;
-  tanggal: string;
-  lokasi: string;
-}
-
-// ✅ CREATE
-export async function POST(req: Request) {
+// ✅ Ambil semua event (public)
+export async function GET() {
   try {
-    const body: EventRequest = await req.json();
-    if (!body.judul || !body.deskripsi || !body.tanggal || !body.lokasi) {
-      return NextResponse.json(
-        { success: false, message: "Semua field wajib diisi", data: null },
-        { status: 400 }
-      );
-    }
-
-    const event = await prisma.event.create({
-      data: {
-        judul: body.judul,
-        deskripsi: body.deskripsi,
-        tanggal: new Date(body.tanggal),
-        lokasi: body.lokasi,
-      },
+    const events = await prisma.event.findMany({
+      orderBy: { tanggal: "asc" },
     });
-
+    return NextResponse.json(events);
+  } catch (err) {
+    console.error("GET /api/event error:", err);
     return NextResponse.json(
-      { success: true, message: "Event berhasil ditambahkan", data: event },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("Error tambah event:", error);
-    return NextResponse.json(
-      { success: false, message: "Terjadi kesalahan server", data: null },
+      { success: false, message: "Gagal mengambil event" },
       { status: 500 }
     );
   }
 }
 
-// ✅ GET ALL
-export async function GET() {
+// ✅ Tambah event (admin only)
+export async function POST(req: Request) {
   try {
-    const events = await prisma.event.findMany();
+    const user = await verifyToken(req);
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { judul, deskripsi, tanggal, lokasi } = await req.json();
+    const event = await prisma.event.create({
+      data: { judul, deskripsi, tanggal: new Date(tanggal), lokasi },
+    });
+
+    return NextResponse.json({ success: true, data: event });
+  } catch (err) {
+    console.error("POST /api/event error:", err);
     return NextResponse.json(
-      { success: true, message: "Daftar event", data: events },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error ambil event:", error);
-    return NextResponse.json(
-      { success: false, message: "Terjadi kesalahan server", data: null },
+      { success: false, message: "Gagal membuat event" },
       { status: 500 }
     );
   }

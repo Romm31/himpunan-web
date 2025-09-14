@@ -1,86 +1,87 @@
+// src/app/api/event/[id]/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
-// GET event by ID
+// ✅ Ambil 1 event
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const event = await prisma.event.findUnique({
       where: { id: Number(params.id) },
     });
-
     if (!event) {
       return NextResponse.json(
-        { error: "Event tidak ditemukan" },
+        { success: false, message: "Event tidak ditemukan" },
         { status: 404 }
       );
     }
-
     return NextResponse.json(event);
-  } catch (err: unknown) {
-    console.error("❌ Error GET /api/event/[id]:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
+  } catch (err) {
+    console.error("GET /api/event/[id] error:", err);
     return NextResponse.json(
-      { error: "Error mengambil event", detail: message },
+      { success: false, message: "Gagal mengambil event" },
       { status: 500 }
     );
   }
 }
 
-// PUT update event
+// ✅ Update event (admin only)
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await req.json();
-    const { judul, deskripsi, tanggal, lokasi } = body;
-
-    if (!judul || !deskripsi || !tanggal || !lokasi) {
+    const user = await verifyToken(req);
+    if (!user) {
       return NextResponse.json(
-        { error: "Semua field wajib diisi (judul, deskripsi, tanggal, lokasi)" },
-        { status: 400 }
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
       );
     }
 
-    const event = await prisma.event.update({
+    const { judul, deskripsi, tanggal, lokasi } = await req.json();
+    const updated = await prisma.event.update({
       where: { id: Number(params.id) },
-      data: {
-        judul,
-        deskripsi,
-        tanggal: new Date(tanggal),
-        lokasi,
-      },
+      data: { judul, deskripsi, tanggal: new Date(tanggal), lokasi },
     });
 
-    return NextResponse.json(event);
-  } catch (err: unknown) {
-    console.error("❌ Error PUT /api/event/[id]:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ success: true, data: updated });
+  } catch (err) {
+    console.error("PUT /api/event/[id] error:", err);
     return NextResponse.json(
-      { error: "Error update event", detail: message },
+      { success: false, message: "Gagal update event" },
       { status: 500 }
     );
   }
 }
 
-// DELETE hapus event
+// ✅ Hapus event (admin only)
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    await prisma.event.delete({
-      where: { id: Number(params.id) },
+    const user = await verifyToken(req);
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    await prisma.event.delete({ where: { id: Number(params.id) } });
+
+    return NextResponse.json({
+      success: true,
+      message: "Event berhasil dihapus",
     });
-    return NextResponse.json({ message: "Event dihapus" });
-  } catch (err: unknown) {
-    console.error("❌ Error DELETE /api/event/[id]:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
+  } catch (err) {
+    console.error("DELETE /api/event/[id] error:", err);
     return NextResponse.json(
-      { error: "Error hapus event", detail: message },
+      { success: false, message: "Gagal menghapus event" },
       { status: 500 }
     );
   }

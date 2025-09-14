@@ -2,7 +2,14 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const PROTECTED_PREFIXES = ["/api/berita", "/api/kategori", "/api/event", "/api/about", "/api/visimisi"];
+const PROTECTED_PREFIXES = [
+  "/api/berita",
+  "/api/kategori",
+  "/api/event",
+  "/api/about",
+  "/api/visimisi",
+  "api/upload",
+];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

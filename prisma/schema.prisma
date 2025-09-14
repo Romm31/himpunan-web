@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
   password  String
   name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  uploads   Upload[]  // ⬅️ relasi ke tabel Upload
 }
 
 model Kategori {
@@ -56,4 +57,16 @@ model VisiMisi {
   misi      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Upload {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  url       String
+  size      Int
+  mimetype  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId Int?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 }

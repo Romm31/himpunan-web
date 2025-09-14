@@ -70,3 +70,15 @@ model Upload {
   userId Int?
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
+
+model Slide {
+  id        Int      @id @default(autoincrement())
+  title     String
+  imageUrl  String
+  order     Int      // gunakan 1 atau 2 untuk posisi slide utama
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([order]) // setiap posisi hanya boleh 1 baris
+}
+

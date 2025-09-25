@@ -20,7 +20,12 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    // TAMBAHKAN BARIS DI BAWAH INI UNTUK MEMAKSA PENCARIAN TIPE
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules"
+    ]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

@@ -22,14 +22,33 @@ const EventPage: NextPage<EventPageProps> = ({ upcomingEvents, pastEvents }) => 
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
       
-      <header ref={headerRef} className={`relative h-64 bg-emerald-dark fade-in-section ${headerInView ? 'is-visible' : ''}`}>
-        <Image src="/about/about.jpeg" layout="fill" objectFit="cover" alt="Kegiatan Himpunan" className="opacity-20" />
+      {/* =============================================================== */}
+      {/* PERUBAHAN DI SINI: Header Baru */}
+      {/* =============================================================== */}
+      <header
+        ref={headerRef}
+        className={`relative h-64 bg-emerald-dark fade-in-section ${
+          headerInView ? 'is-visible' : ''
+        }`}
+      >
+        {/* Pastikan Anda memiliki gambar ini di folder public/header/event-header.jpg */}
+        <Image
+          src="/header/event-header.jpeg" // Ganti dengan path gambar baru Anda untuk event
+          layout="fill"
+          objectFit="cover"
+          alt="Latar Belakang Kalender Kegiatan"
+          className="opacity-20"
+          priority
+        />
         <div className="absolute inset-0 flex items-center justify-center">
           <h1 className="text-6xl font-bold text-white font-heading tracking-wider drop-shadow-lg">
             Kalender Kegiatan
           </h1>
         </div>
       </header>
+      {/* =============================================================== */}
+      {/* AKHIR PERUBAHAN HEADER */}
+      {/* =============================================================== */}
 
       <main className="flex-grow">
         <section id="upcoming-events" className="bg-white py-16">
@@ -59,7 +78,6 @@ const EventPage: NextPage<EventPageProps> = ({ upcomingEvents, pastEvents }) => 
               <div className="mt-2 w-20 h-1 bg-emerald-himp rounded-full"></div>
             </div>
             {pastEvents.length > 0 ? (
-              // PERUBAHAN DI SINI: Menggunakan Grid
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {pastEvents.map((event) => (
                   <EventCard key={event.id} event={event} isPast={true} />
@@ -81,6 +99,7 @@ const EventPage: NextPage<EventPageProps> = ({ upcomingEvents, pastEvents }) => 
 
 export default EventPage;
 
+// getServerSideProps tidak perlu diubah
 export const getServerSideProps: GetServerSideProps = async () => {
   const now = new Date();
   const allEvents = await prisma.event.findMany({

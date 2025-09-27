@@ -8,7 +8,7 @@ import AboutUsSection from '@/components/AboutUsSection';
 import Footer from '@/components/Footer';
 import HeroSlider from '@/components/HeroSlider';
 import EventsSection from '@/components/EventsSection';
-import ShapeDivider from '@/components/ShapeDivider'; // Impor komponen baru
+import ShapeDivider from '@/components/ShapeDivider';
 import { About, Event, Slide, VisiMisi } from '@prisma/client';
 
 interface HomeProps {
@@ -21,11 +21,12 @@ interface HomeProps {
 
 const Home: NextPage<HomeProps> = ({ slides, latestBerita, visiMisi, about, events }) => {
   return (
-    <div className="bg-gray-50 flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
       <main className="flex-grow">
-        <HeroSlider slides={slides} />
-        <ShapeDivider /> {/* Tambahkan Shape Divider di sini */}
+        {/* Kirim data slides dan berita ke HeroSlider */}
+        <HeroSlider slides={slides} berita={latestBerita} />
+        <ShapeDivider />
         <NewsSlider berita={latestBerita} />
         <EventsSection events={events} />
         <VisiMisiSection data={visiMisi} />
@@ -39,9 +40,10 @@ const Home: NextPage<HomeProps> = ({ slides, latestBerita, visiMisi, about, even
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async () => {
+  // Ambil 2 slide utama dan 4 berita terbaru
   const [slides, latestBerita, visiMisi, about, events] = await Promise.all([
-    prisma.slide.findMany({ orderBy: { order: 'asc' } }),
-    prisma.berita.findMany({ take: 8, orderBy: { createdAt: 'desc' } }),
+    prisma.slide.findMany({ orderBy: { order: 'asc' }, take: 2 }),
+    prisma.berita.findMany({ take: 4, orderBy: { createdAt: 'desc' } }),
     prisma.visiMisi.findFirst({ orderBy: { createdAt: 'desc' } }),
     prisma.about.findFirst(),
     prisma.event.findMany({ take: 3, orderBy: { tanggal: 'desc' } }),

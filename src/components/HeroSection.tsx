@@ -1,35 +1,77 @@
-// src/components/HeroSection.tsx
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Slide } from '@prisma/client';
+import { BeritaType } from '@/types';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Autoplay, EffectFade } from 'swiper/modules';
+import 'swiper/css/effect-fade';
 
-const HeroSection: React.FC = () => {
-  return (
-    <section className="bg-gray-900 text-white">
-      <div className="container mx-auto flex px-5 py-24 md:flex-row flex-col items-center">
-        <div className="lg:flex-grow md:w-1-2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
-          <h1 className="title-font sm:text-5xl text-4xl mb-4 font-bold text-white">
-            Selamat Datang di Website Himpunan
-          </h1>
-          <p className="mb-8 leading-relaxed text-gray-300">
-            Wadah untuk memajukan kreativitas dalam pengembangan Linux dan Open Source.
-          </p>
-          <div className="flex justify-center">
-            <a href="#berita" className="inline-flex text-white bg-green-600 border-0 py-3 px-8 focus:outline-none hover:bg-green-700 rounded-lg text-lg transition-colors">
-              Lihat Berita Terbaru
-            </a>
-          </div>
-        </div>
-        <div className="lg:max-w-lg lg:w-full md:w-1-2 w-5/6">
-          <Image
-            className="object-cover object-center rounded"
-            alt="Maskot Himpunan"
-            width={720}
-            height={600}
-            src="/placeholder-mascot.png" 
-          />
-        </div>
+interface HeroSliderProps {
+  slides: Slide[];
+  berita: BeritaType[];
+}
+
+const HeroSlider: React.FC<HeroSliderProps> = ({ slides, berita }) => {
+  // 1. Gabungkan data slide dari database dan dari berita
+  const combinedSlides = [
+    ...slides.map(slide => ({
+      id: `slide-${slide.id}`,
+      title: slide.title,
+      imageUrl: slide.imageUrl,
+      href: '/', // Slide utama bisa diarahkan ke homepage
+    })),
+    ...berita
+      .filter(item => item.gambarUrl) // Hanya ambil berita yang punya gambar
+      .map(item => ({
+        id: `berita-${item.id}`,
+        title: item.judul,
+        imageUrl: item.gambarUrl!, // Tanda seru (!) karena kita sudah filter null
+        href: `/berita/${item.id}`, // Arahkan ke detail berita
+      })),
+  ];
+
+  if (combinedSlides.length === 0) {
+    return (
+      <div className="w-full h-[70vh] bg-gray-300 flex items-center justify-center">
+        <p className="text-gray-500">Tidak ada slide untuk ditampilkan.</p>
       </div>
+    );
+  }
+
+  return (
+    <section className="w-full h-[70vh] relative overflow-hidden bg-gray-900">
+      <Swiper
+        modules={[Pagination, Autoplay, EffectFade]}
+        effect="fade"
+        slidesPerView={1}
+        pagination={{ clickable: true }}
+        loop={true}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        className="w-full h-full"
+      >
+        {combinedSlides.map((slide) => (
+          <SwiperSlide key={slide.id}>
+            <Link href={slide.href} className="block w-full h-full relative group">
+              <Image
+                src={slide.imageUrl}
+                alt={slide.title}
+                layout="fill"
+                objectFit="cover"
+                priority={slide.id.startsWith('slide-')} // Prioritaskan slide utama
+                className="brightness-75 group-hover:brightness-50 transition-all duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-center justify-center p-8 text-center">
+                <h1 className="text-white text-4xl md:text-6xl font-bold font-heading leading-tight drop-shadow-md">
+                  {slide.title}
+                </h1>
+              </div>
+            </Link>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </section>
   );
 };
-export default HeroSection;
+
+export default HeroSlider;

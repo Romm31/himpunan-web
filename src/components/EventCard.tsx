@@ -17,12 +17,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
   const eventDate = new Date(event.tanggal);
   const day = eventDate.getDate();
   const month = eventDate.toLocaleString('id-ID', { month: 'short' }).toUpperCase();
-
+  
   return (
     <div ref={ref} className={`fade-in-section ${inView ? 'is-visible' : ''} h-full`}>
       <div
-        className={`bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group h-full flex flex-col transform hover:-translate-y-2 ${
-          isPast ? 'opacity-70 grayscale' : ''
+        className={`bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group h-full flex flex-col transform hover:-translate-y-2 overflow-hidden ${ // <-- TAMBAHKAN DI SINI
+          isPast ? 'opacity-70' : ''
         }`}
       >
         {/* Header Kartu dengan Tanggal */}

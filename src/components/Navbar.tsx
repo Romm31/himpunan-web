@@ -1,4 +1,4 @@
-// src/components/Navbar.tsx
+// src/components/Navbar.tsx (Updated for Elegance & Emerald)
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,46 +14,36 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="bg-green-700 shadow-md sticky top-0 z-50 text-white">
+    <header className="bg-emerald-himp shadow-lg sticky top-0 z-50 text-white font-sans">
       <div className="container mx-auto flex justify-between items-center p-4">
-        {/* Sisi Kiri: Branding */}
-        <Link href="/" className="flex items-center space-x-3">
-          {/* Ganti src dengan path logo Anda di folder /public */}
-          <Image src="/logo-placeholder.svg" alt="Logo HIMPENAS" width={40} height={40} />
-          <span className="font-bold text-xl tracking-wider">HIMPENAS</span>
+        <Link href="/" className="flex items-center space-x-3 transition-transform duration-300 hover:scale-105">
+          {/* Menggunakan path logo Anda */}
+          <Image src="/logo/logo.png" alt="Logo HIMPENAS" width={48} height={48} className="rounded-full" />
+          <span className="font-bold text-2xl tracking-wide">HIMPENAS</span>
         </Link>
-
-        {/* Sisi Kanan: Navigasi Desktop */}
-        <nav className="hidden md:flex space-x-8">
+        <nav className="hidden md:flex space-x-8 text-lg">
           {navLinks.map((link) => (
-            <Link key={link.name} href={link.href} className="hover:text-green-200 transition-colors">
+            <Link key={link.name} href={link.href} className="relative hover:text-emerald-light transition-colors group">
               {link.name}
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-light scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </Link>
           ))}
         </nav>
-
-        {/* Tombol Hamburger untuk Mobile */}
         <div className="md:hidden">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle Menu">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle Menu" className="text-white hover:text-emerald-light transition-colors">
             {isMenuOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" /></svg>
             )}
           </button>
         </div>
       </div>
-
-      {/* Menu Dropdown Mobile */}
       {isMenuOpen && (
-        <div className="md:hidden bg-green-700">
-          <nav className="flex flex-col items-center space-y-4 py-4">
+        <div className="md:hidden bg-emerald-dark text-white shadow-inner pb-4">
+          <nav className="flex flex-col items-center space-y-4 py-4 text-lg">
             {navLinks.map((link) => (
-              <Link key={link.name} href={link.href} className="hover:text-green-200 transition-colors" onClick={() => setIsMenuOpen(false)}>
+              <Link key={link.name} href={link.href} className="hover:text-emerald-light transition-colors" onClick={() => setIsMenuOpen(false)}>
                 {link.name}
               </Link>
             ))}
@@ -63,5 +53,4 @@ const Navbar: React.FC = () => {
     </header>
   );
 };
-
 export default Navbar;

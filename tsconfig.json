@@ -21,7 +21,6 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    // TAMBAHKAN BARIS DI BAWAH INI UNTUK MEMAKSA PENCARIAN TIPE
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules"

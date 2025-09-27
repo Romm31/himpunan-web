@@ -1,4 +1,4 @@
-// src/components/Navbar.tsx (Updated for Elegance & Emerald)
+// src/components/Navbar.tsx
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -6,9 +6,11 @@ import Image from 'next/image';
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Tambahkan 'Event' ke dalam array navLinks
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Berita', href: '#berita' },
+    { name: 'Event', href: '#event' }, // <-- DITAMBAHKAN DI SINI
     { name: 'Visi & Misi', href: '#visi-misi' },
     { name: 'Tentang Kami', href: '#tentang' },
   ];
@@ -17,7 +19,6 @@ const Navbar: React.FC = () => {
     <header className="bg-emerald-himp shadow-lg sticky top-0 z-50 text-white font-sans">
       <div className="container mx-auto flex justify-between items-center p-4">
         <Link href="/" className="flex items-center space-x-3 transition-transform duration-300 hover:scale-105">
-          {/* Menggunakan path logo Anda */}
           <Image src="/logo/logo.png" alt="Logo HIMPENAS" width={48} height={48} className="rounded-full" />
           <span className="font-bold text-2xl tracking-wide">HIMPENAS</span>
         </Link>

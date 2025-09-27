@@ -1,4 +1,4 @@
-// src/pages/index.tsx (Disesuaikan untuk HeroSlider Statis)
+// src/pages/index.tsx
 import type { GetServerSideProps, NextPage } from 'next';
 import { BeritaType } from '@/types';
 import { prisma } from '@/lib/prisma';
@@ -7,24 +7,26 @@ import NewsSlider from '@/components/NewsSlider';
 import VisiMisiSection from '@/components/VisiMisiSection';
 import AboutUsSection from '@/components/AboutUsSection';
 import Footer from '@/components/Footer';
-import HeroSlider from '@/components/HeroSlider'; // Impor HeroSlider
-import { About, VisiMisi } from '@prisma/client';
+import HeroSlider from '@/components/HeroSlider';
+import EventsSection from '@/components/EventsSection';
+import { About, Event, Slide, VisiMisi } from '@prisma/client';
 
-// Hapus 'slides' dari props
 interface HomeProps {
+  slides: Slide[];
   latestBerita: BeritaType[];
   visiMisi: VisiMisi | null;
   about: About | null;
+  events: Event[];
 }
 
-const Home: NextPage<HomeProps> = ({ latestBerita, visiMisi, about }) => {
+const Home: NextPage<HomeProps> = ({ slides, latestBerita, visiMisi, about, events }) => {
   return (
-    <div>
+    <div className="bg-gray-50">
       <Navbar />
       <main>
-        {/* Panggil HeroSlider tanpa mengirim props */}
-        <HeroSlider />
+        <HeroSlider slides={slides} />
         <NewsSlider berita={latestBerita} />
+        <EventsSection events={events} />
         <VisiMisiSection data={visiMisi} />
         <AboutUsSection data={about} />
       </main>
@@ -36,18 +38,22 @@ const Home: NextPage<HomeProps> = ({ latestBerita, visiMisi, about }) => {
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  // Hanya ambil data untuk Berita, VisiMisi, dan About
-  const [latestBerita, visiMisi, about] = await Promise.all([
+  const [slides, latestBerita, visiMisi, about, events] = await Promise.all([
+    prisma.slide.findMany({ orderBy: { order: 'asc' } }),
     prisma.berita.findMany({ take: 8, orderBy: { createdAt: 'desc' } }),
     prisma.visiMisi.findFirst({ orderBy: { createdAt: 'desc' } }),
     prisma.about.findFirst(),
+    // Logika untuk mengambil 3 event terbaru sudah benar
+    prisma.event.findMany({ take: 3, orderBy: { tanggal: 'desc' } }),
   ]);
 
   return {
     props: {
+      slides: JSON.parse(JSON.stringify(slides)),
       latestBerita: JSON.parse(JSON.stringify(latestBerita)),
       visiMisi: JSON.parse(JSON.stringify(visiMisi)),
       about: JSON.parse(JSON.stringify(about)),
+      events: JSON.parse(JSON.stringify(events)),
     },
   };
 };

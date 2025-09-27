@@ -1,4 +1,3 @@
-// src/types/index.ts
-import type { Berita } from '@prisma/client';
-
+import type { Berita, Kategori } from '@prisma/client'; // Tambahkan Kategori
 export type BeritaType = Berita;
+

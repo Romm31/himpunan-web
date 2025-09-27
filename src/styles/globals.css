@@ -1,12 +1,18 @@
-/* 1. Perintah Dasar Tailwind (Wajib) */
+/* 1. Perintah Dasar Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* 2. Style Dasar & Animasi Kustom */
-html {
-  scroll-behavior: smooth;
-  font-family: 'Inter', sans-serif;
+@layer base {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', sans-serif;
+  }
 }
 
 @keyframes fade-in-up {

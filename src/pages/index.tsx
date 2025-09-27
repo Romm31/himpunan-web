@@ -43,7 +43,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
     prisma.berita.findMany({ take: 8, orderBy: { createdAt: 'desc' } }),
     prisma.visiMisi.findFirst({ orderBy: { createdAt: 'desc' } }),
     prisma.about.findFirst(),
-    // Logika untuk mengambil 3 event terbaru sudah benar
     prisma.event.findMany({ take: 3, orderBy: { tanggal: 'desc' } }),
   ]);
 

@@ -5,18 +5,18 @@ const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    // Anda bisa hapus baris './src/app/...' jika sudah menghapus folder app router
   ],
   theme: {
     extend: {
       colors: {
-        'emerald-himp': '#046A38', // Warna hijau emerald utama
-        'emerald-light': '#068A48', // Untuk hover
-        'emerald-dark': '#024D26',  // Untuk variasi lebih gelap
+        'emerald-himp': '#046A38',
+        'emerald-light': '#068A48',
+        'emerald-dark': '#024D26',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'], // Font utama
-        serif: ['Merriweather', 'serif'], // Font untuk judul
+        sans: ['Inter', 'sans-serif'], // Font untuk teks biasa (tetap)
+        // Ganti 'serif' menjadi 'heading' agar lebih jelas
+        heading: ['Poppins', 'sans-serif'], // Font untuk judul
       },
     },
   },

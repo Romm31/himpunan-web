@@ -1,4 +1,3 @@
-// src/components/Navbar.tsx
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -6,13 +5,13 @@ import Image from 'next/image';
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Tambahkan 'Event' ke dalam array navLinks
+  // Perbarui href untuk Event
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Berita', href: '#berita' },
-    { name: 'Event', href: '#event' }, // <-- DITAMBAHKAN DI SINI
-    { name: 'Visi & Misi', href: '#visi-misi' },
-    { name: 'Tentang Kami', href: '#tentang' },
+    { name: 'Berita', href: '/#berita' }, // Arahkan ke section di homepage
+    { name: 'Event', href: '/event' }, // <-- Mengarah ke halaman baru
+    { name: 'Visi & Misi', href: '/#visi-misi' }, // Arahkan ke section di homepage
+    { name: 'Tentang Kami', href: '/#tentang' }, // Arahkan ke section di homepage
   ];
 
   return (

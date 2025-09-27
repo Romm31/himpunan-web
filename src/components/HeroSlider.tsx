@@ -1,4 +1,4 @@
-// src/components/HeroSlider.tsx
+// src/components/HeroSlider.tsx (Versi Dinamis dari Database)
 import React from 'react';
 import Image from 'next/image';
 import { Slide } from '@prisma/client'; // Impor tipe Slide
@@ -11,11 +11,11 @@ interface HeroSliderProps {
 }
 
 const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
-  // Jika tidak ada data dari DB, jangan tampilkan apa-apa atau tampilkan fallback
+  // Jika tidak ada data dari DB, tampilkan pesan
   if (!slides || slides.length === 0) {
     return (
       <div className="w-full h-[60vh] bg-gray-300 flex items-center justify-center">
-        <p className="text-gray-500">Silakan tambahkan data slide di database.</p>
+        <p className="text-gray-500">Silakan tambahkan data slide di database melalui Prisma Studio.</p>
       </div>
     );
   }

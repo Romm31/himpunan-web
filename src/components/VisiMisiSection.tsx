@@ -1,4 +1,3 @@
-// src/components/VisiMisiSection.tsx
 import React from 'react';
 import { VisiMisi } from '@prisma/client';
 import { useInView } from 'react-intersection-observer';
@@ -15,7 +14,9 @@ const VisiMisiSection: React.FC<VisiMisiProps> = ({ data }) => {
     <section id="visi-misi" ref={ref} className={`py-20 bg-gray-50 fade-in-section ${inView ? 'is-visible' : ''}`}>
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-emerald-dark font-heading tracking-tight">Visi & Misi</h2>
+          <h2 className="text-4xl font-bold font-heading tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-himp to-emerald-dark">
+            Visi & Misi
+          </h2>
           <div className="mt-4 w-24 h-1 bg-emerald-himp mx-auto rounded-full"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">

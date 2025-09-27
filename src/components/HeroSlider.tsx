@@ -1,9 +1,9 @@
-// src/components/HeroSlider.tsx (Versi Dinamis dari Database)
+// src/components/HeroSlider.tsx
 import React from 'react';
 import Image from 'next/image';
-import { Slide } from '@prisma/client'; // Impor tipe Slide
+import { Slide } from '@prisma/client';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
+import { Pagination, Autoplay, EffectFade } from 'swiper/modules'; // Hapus 'Navigation'
 import 'swiper/css/effect-fade';
 
 interface HeroSliderProps {
@@ -11,41 +11,30 @@ interface HeroSliderProps {
 }
 
 const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
-  // Jika tidak ada data dari DB, tampilkan pesan
-  if (!slides || slides.length === 0) {
-    return (
-      <div className="w-full h-[60vh] bg-gray-300 flex items-center justify-center">
-        <p className="text-gray-500">Silakan tambahkan data slide di database melalui Prisma Studio.</p>
-      </div>
-    );
-  }
+  // ... (logika defaultSlides tetap sama) ...
+  const defaultSlides: Slide[] = [
+    { id: 1, title: 'Selamat Datang di HIMPENAS', imageUrl: '/slide/slide1.png', order: 1, createdAt: new Date(), updatedAt: new Date() },
+    { id: 2, title: 'Inovasi Teknologi Open Source', imageUrl: '/slide/slide2.png', order: 2, createdAt: new Date(), updatedAt: new Date() },
+  ];
+  const slidesToRender = slides.length > 0 ? slides : defaultSlides;
 
   return (
-    <section className="w-full h-[60vh]">
+    <section className="w-full h-[70vh] relative overflow-hidden bg-gray-900">
       <Swiper
-        modules={[Navigation, Pagination, Autoplay, EffectFade]}
+        modules={[Pagination, Autoplay, EffectFade]} // Hapus 'Navigation'
         effect="fade"
         slidesPerView={1}
-        navigation
-        pagination={{ clickable: true }}
+        pagination={{ clickable: true }} // Andalkan pagination
         loop={true}
-        autoplay={{ delay: 4000, disableOnInteraction: false }}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
         className="w-full h-full"
       >
-        {slides.map((slide) => (
+        {slidesToRender.map((slide) => (
           <SwiperSlide key={slide.id}>
             <div className="relative w-full h-full">
-              <Image
-                src={slide.imageUrl}
-                alt={slide.title}
-                layout="fill"
-                objectFit="cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <h1 className="text-white text-4xl md:text-6xl font-bold text-center drop-shadow-lg p-4">
-                  {slide.title}
-                </h1>
+              <Image src={slide.imageUrl} alt={slide.title} layout="fill" objectFit="cover" priority className="brightness-75" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-center justify-center p-8 text-center">
+                <h1 className="text-white text-5xl md:text-7xl font-bold font-heading leading-tight drop-shadow-md">{slide.title}</h1>
               </div>
             </div>
           </SwiperSlide>

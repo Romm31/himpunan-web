@@ -1,16 +1,25 @@
+/* 1. Perintah Dasar Tailwind (Wajib) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Style Dasar & Scroll Halus */
-@layer base {
-  html {
-    scroll-behavior: smooth;
-    font-family: 'Inter', sans-serif; /* Pastikan font dasar konsisten */
+/* 2. Style Dasar & Animasi Kustom */
+html {
+  scroll-behavior: smooth;
+  font-family: 'Inter', sans-serif;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Kelas untuk Memicu Animasi Saat Scroll */
 .fade-in-section {
   opacity: 0;
   transform: translateY(30px);
@@ -22,7 +31,7 @@
   transform: translateY(0);
 }
 
-/* Style Kustom untuk Swiper Slider agar lebih elegan */
+/* 3. Styling Kustom untuk Swiper Slider */
 .swiper-button-next,
 .swiper-button-prev {
   color: #ffffff !important;
@@ -32,15 +41,44 @@
   height: 44px !important;
   transition: background-color 0.3s ease;
 }
+
 .swiper-button-next:hover,
 .swiper-button-prev:hover {
-  background-color: rgba(4, 106, 56, 0.7);
+    background-color: rgba(4, 106, 56, 0.7);
 }
+
 .swiper-button-next::after,
 .swiper-button-prev::after {
   font-size: 20px !important;
   font-weight: bold;
 }
+
 .swiper-pagination-bullet-active {
   background-color: #046A38 !important; /* Warna Hijau Emerald */
+}
+
+/* Tombol Panah Slider Berita yang Elegan (custom) */
+.news-slider-container .swiper-button-next,
+.news-slider-container .swiper-button-prev {
+  width: 40px !important;
+  height: 40px !important;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.news-slider-container:hover .swiper-button-next,
+.news-slider-container:hover .swiper-button-prev {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.news-slider-container .swiper-button-next::after,
+.news-slider-container .swiper-button-prev::after {
+  font-size: 16px !important;
+}
+
+/* Efek "Glow" Hijau untuk Kartu */
+.card-hover-effect:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -15px rgba(4, 106, 56, 0.3);
 }

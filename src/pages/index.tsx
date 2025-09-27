@@ -1,4 +1,3 @@
-// src/pages/index.tsx
 import type { GetServerSideProps, NextPage } from 'next';
 import { BeritaType } from '@/types';
 import { prisma } from '@/lib/prisma';
@@ -9,6 +8,7 @@ import AboutUsSection from '@/components/AboutUsSection';
 import Footer from '@/components/Footer';
 import HeroSlider from '@/components/HeroSlider';
 import EventsSection from '@/components/EventsSection';
+import ShapeDivider from '@/components/ShapeDivider'; // Impor komponen baru
 import { About, Event, Slide, VisiMisi } from '@prisma/client';
 
 interface HomeProps {
@@ -21,10 +21,11 @@ interface HomeProps {
 
 const Home: NextPage<HomeProps> = ({ slides, latestBerita, visiMisi, about, events }) => {
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-50 flex flex-col min-h-screen">
       <Navbar />
-      <main>
+      <main className="flex-grow">
         <HeroSlider slides={slides} />
+        <ShapeDivider /> {/* Tambahkan Shape Divider di sini */}
         <NewsSlider berita={latestBerita} />
         <EventsSection events={events} />
         <VisiMisiSection data={visiMisi} />
